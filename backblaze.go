@@ -29,10 +29,8 @@ type user struct {
 type TokenParams struct {
 	BucketID       string `json:"bucketId"`
 	FileName       string `json:"fileName"`
-	FileNamePrefix string `json:"fileNamePrefix"`
 	BucketName     string `json:"bucketName"`
 	Duration       string `json:"duration"`
-  AuthorizationToken string `json:"authorizationToken"`
 }
 
 // Logins into backblaze account from given key
@@ -73,7 +71,7 @@ func GetFileDownloadUrl(authToken string, token TokenParams) (string, error) {
 	type respModel struct {
 		AuthorizationToken string `json:"authorizationToken"`
 		BucketID           string `json:"bucketId"`
-	}
+  }
 
 	var temporaryDownloadToken respModel
 
@@ -81,6 +79,8 @@ func GetFileDownloadUrl(authToken string, token TokenParams) (string, error) {
 		"https://api002.backblazeb2.com/b2api/v2/b2_get_download_authorization?bucketId=" + token.BucketID +
 			"&fileNamePrefix=" + token.FileName + "&validDurationInSeconds=" + token.Duration,
 	)
+
+  // Get temporaryDownloadToken for single file ( or possibly group )
 	c := http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -107,7 +107,7 @@ func GetFileDownloadUrl(authToken string, token TokenParams) (string, error) {
 	}
 
 	// piece link from authToken and fileName
-	completeDownloadUrl := "https://f002.backblazeb2.com/file/" + token.BucketName + "/" + token.FileName + "?Authorization=" + token.AuthorizationToken
+	completeDownloadUrl := "https://f002.backblazeb2.com/file/" + token.BucketName + "/" + token.FileName + "?Authorization=" + temporaryDownloadToken.AuthorizationToken
 
 	return completeDownloadUrl, nil
 }
