@@ -34,7 +34,7 @@ type TokenParams struct {
 }
 
 // Logins into backblaze account from given key
-func GetDownloadUser(authKey string) (*user, error) {
+func GetUser(authKey string) (*user, error) {
 	client := http.Client{}
 	authorizeAccountURL := "https://api.backblazeb2.com/b2api/v2/b2_authorize_account"
 
@@ -66,7 +66,7 @@ func GetDownloadUser(authKey string) (*user, error) {
 }
 
 // Returns download url given a users Authorization Token, and paramaters
-func GetFileDownloadUrl(authToken string, token TokenParams) (string, error) {
+func (u *user)GetFileDownloadUrl(token TokenParams) (string, error) {
 
 	type respModel struct {
 		AuthorizationToken string `json:"authorizationToken"`
@@ -88,7 +88,7 @@ func GetFileDownloadUrl(authToken string, token TokenParams) (string, error) {
 	}
 
 	req.Header = http.Header{
-		"Authorization": []string{authToken},
+		"Authorization": []string{u.AuthorizationToken},
 	}
 
 	resp, err := c.Do(req)
