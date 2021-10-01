@@ -26,14 +26,16 @@ type user struct {
 	S3APIURL            string `json:"s3ApiUrl"`
 }
 
-type TokenParams struct {
-	BucketID       string `json:"bucketId"`
-	FileName       string `json:"fileName"`
-	BucketName     string `json:"bucketName"`
-	Duration       string `json:"duration"`
+type DownloadUrlTokenParams struct {
+	BucketID   string `json:"bucketId"`
+	FileName   string `json:"fileName"`
+	BucketName string `json:"bucketName"`
+	Duration   string `json:"duration"`
 }
 
-// Logins into backblaze account from given key
+// log into backblaze with accountId, and ApplicationKey
+// string should be passed as <applicationKeyId:applicationKey>
+// refer to documentation https://www.backblaze.com/b2/docs/b2_authorize_account.html
 func GetUser(authKey string) (*user, error) {
 	client := http.Client{}
 	authorizeAccountURL := "https://api.backblazeb2.com/b2api/v2/b2_authorize_account"
@@ -66,12 +68,12 @@ func GetUser(authKey string) (*user, error) {
 }
 
 // Returns download url given a users Authorization Token, and paramaters
-func (u *user)GetFileDownloadUrl(token TokenParams) (string, error) {
+func (u *user) GetFileDownloadUrl(token DownloadUrlTokenParams) (string, error) {
 
 	type respModel struct {
 		AuthorizationToken string `json:"authorizationToken"`
 		BucketID           string `json:"bucketId"`
-  }
+	}
 
 	var temporaryDownloadToken respModel
 
@@ -80,7 +82,7 @@ func (u *user)GetFileDownloadUrl(token TokenParams) (string, error) {
 			"&fileNamePrefix=" + token.FileName + "&validDurationInSeconds=" + token.Duration,
 	)
 
-  // Get temporaryDownloadToken for single file ( or possibly group )
+	// Get temporaryDownloadToken for single file ( or possibly group )
 	c := http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

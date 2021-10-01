@@ -13,6 +13,8 @@ import (
 )
 
 func GetLink(w http.ResponseWriter, req *http.Request) {
+	var config backblaze.DownloadUrlTokenParams
+
   // get data from POST req
 	data := json.NewDecoder(req.Body)
 	err := data.Decode(&token)
@@ -20,9 +22,8 @@ func GetLink(w http.ResponseWriter, req *http.Request) {
     panic(err)
   }
 
-	var token backblaze.TokenParams
 
-  // log into backblaze account with key
+  // log into backblaze with accountId, and ApplicationKey
 	user, err := backblaze.GetUser("your-backblaze-key-here")
   if err != nil {
     panic(err)
